@@ -94,7 +94,7 @@ export default function App() {
 								<input id="name"
 									name="name"
 									type="text"
-									placeholder="Nombre"
+									placeholder="Name"
 									value={nombre}
 
 									onChange={handleNombreChange}

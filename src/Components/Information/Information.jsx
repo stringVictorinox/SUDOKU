@@ -7,7 +7,7 @@ export default function Information({ activeButtonIndex, setActiveButtonIndex, j
   const [totalSegundos, setTotalSegundos] = useState(0);
   const [cronometroActivo, setCronometroActivo] = useState(true);
 
-  const { state, clearSudoku, setSudoku } = useSudoku();
+  const { state, clearSudoku, setSudoku, resolveSudoku } = useSudoku();
 
   useEffect(() => {
     const cronometroInterval = setInterval(() => {
@@ -21,10 +21,13 @@ export default function Information({ activeButtonIndex, setActiveButtonIndex, j
   }, [cronometroActivo]);
 
   useEffect(() => {
+
+    console.log(state.isvalid);
+    
     if (state.isvalid === true) {
       setCronometroActivo(false);
     }
-  }, [setSudoku])
+  }, [setSudoku, resolveSudoku])
 
 
   // Función para cambiar el botón activo
@@ -63,6 +66,10 @@ export default function Information({ activeButtonIndex, setActiveButtonIndex, j
     clearSudoku();
   }
 
+  const ResolveSudoku = () => {
+    resolveSudoku();
+  }
+
   const ResetGame = () => {
     setJuegoIniciado(!juegoIniciado);
   }
@@ -79,7 +86,7 @@ export default function Information({ activeButtonIndex, setActiveButtonIndex, j
 
       <div className="flex mx-auto w-80 justify-center gap-x-4 mt-2">
         <button onClick={() => ClearSudoku()} className="flex rounded bg-yellow-300 px-2 py-1 font-Lato hover:bg-yellow-400 transition-transform transform hover:-translate-y-1"> Clear </button>
-        <button className="flex rounded bg-purple-300 px-2 py-1 font-Lato hover:bg-purple-400 transition-transform transform hover:-translate-y-1"> Resolve </button>
+        <button onClick={() => ResolveSudoku()}className="flex rounded bg-purple-300 px-2 py-1 font-Lato hover:bg-purple-400 transition-transform transform hover:-translate-y-1"> Resolve </button>
         <button onClick={() => ResetGame()} className="flex rounded bg-blue-300 px-2 py-1 font-Lato hover:bg-blue-400 transition-transform transform hover:-translate-y-1"> New Game </button>
       </div>
 

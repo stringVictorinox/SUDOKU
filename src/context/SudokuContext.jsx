@@ -7,6 +7,7 @@ const CREATE_SUDOKU = "CREATE_SUDOKU";
 const CLEAR_SUDOKU = "CLEAR_SUDOKU";
 const SET_SUDOKU = "SET_SUDOKU";
 const CANCEL_SUDOKU = "CANCEL_SUDOKU";
+const RESOLVE_SUDOKU = "RESOLVE_SUDOKU";
 const CHECK_SUDOKU = "CHECK_SUDOKU";
 
 const sudokuReducer = (state, action) => {
@@ -15,10 +16,9 @@ const sudokuReducer = (state, action) => {
         case CREATE_SUDOKU: {
 
             const { difficulty } = action.payload;
+            state.solution = getSudoku(difficulty);
 
-            const sudoku = getSudoku(difficulty);
-
-            let puzzle = sudoku.puzzle;
+            let puzzle = state.solution.puzzle;
 
             for (let i = 0; i < 9; i++) {
                 for (let j = 0; j < 9; j++) {
@@ -37,7 +37,7 @@ const sudokuReducer = (state, action) => {
         }
 
         case CLEAR_SUDOKU: {
-            return { ...state, sudokuCopy: [...state.sudokuArr] }; // Copiar sudokuArr a sudokuCopy
+            return { ...state, sudokuCopy: [...state.sudokuArr] };
         }
 
         case SET_SUDOKU: {
@@ -61,13 +61,31 @@ const sudokuReducer = (state, action) => {
             return { ...state }
         }
 
+        case RESOLVE_SUDOKU: {
+            var solution = state.solution.solution;
+            
+            // Crear una copia profunda de state
+            const newState = { ...state, sudokuCopy: [], isvalid: true };
+        
+            for (let i = 0; i < 9; i++) {
+                newState.sudokuCopy[i] = []; // Inicializar cada fila
+        
+                for (let j = 0; j < 9; j++) {
+                    newState.sudokuCopy[i][j] = solution.charAt(0);
+                    solution = solution.substring(1);
+                }
+            }
+            
+            return newState;
+        }
+
         case CANCEL_SUDOKU: {
-            return { ...state, isvalid: false};
+            return { ...state, isvalid: false };
         }
 
         case CHECK_SUDOKU: {
 
-            if ( checkColumns(state.sudokuCopy) && checkRows(state.sudokuCopy) && checkSubgrids(state.sudokuCopy)) {
+            if (checkColumns(state.sudokuCopy) && checkRows(state.sudokuCopy) && checkSubgrids(state.sudokuCopy)) {
                 return { ...state, isvalid: true };
             }
 
@@ -99,6 +117,7 @@ export const SudokuProvider = ({ children }) => {
         sudokuArr: initialSudoku,
         sudokuCopy: initialSudoku,
         isvalid: false,
+        solution: {}
     });
 
     const createSudoku = (difficulty) => {
@@ -106,7 +125,7 @@ export const SudokuProvider = ({ children }) => {
     }
 
     const clearSudoku = () => {
-        dispatch({ type: CLEAR_SUDOKU, payload: initialSudoku });
+        dispatch({ type: CLEAR_SUDOKU, payload: {} });
     };
 
     const setSudoku = (value, pos, information, isModificable) => {
@@ -117,12 +136,16 @@ export const SudokuProvider = ({ children }) => {
         dispatch({ type: CHECK_SUDOKU, payload: {} });
     }
 
+    const resolveSudoku = () => {
+        dispatch({ type: RESOLVE_SUDOKU, payload: {} });
+    }
+
     const cancelSudoku = () => {
         dispatch({ type: CANCEL_SUDOKU, payload: {} });
     }
 
     return (
-        <SudokuContext.Provider value={{ state, createSudoku, clearSudoku, setSudoku, checkSudoku, cancelSudoku }}>
+        <SudokuContext.Provider value={{ state, createSudoku, clearSudoku, setSudoku, checkSudoku, resolveSudoku, cancelSudoku }}>
             {children}
         </SudokuContext.Provider>
     );
